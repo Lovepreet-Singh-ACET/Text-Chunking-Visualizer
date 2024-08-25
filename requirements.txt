@@ -1,0 +1,5 @@
+streamlit
+langchain
+nltk
+spacy
+PyPDF2
