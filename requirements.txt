@@ -1,5 +1,10 @@
 streamlit
-langchain
-nltk
+PyPDF2=3.0.1
+tiktoken
+langchain=0.2.14
+langchain-community=0.2.12
+langchain-core=0.2.34
+langchain-openai=0.1.22
+langchain-text-splitters=0.2.2
+openai=1.42.0
 spacy
-PyPDF2
