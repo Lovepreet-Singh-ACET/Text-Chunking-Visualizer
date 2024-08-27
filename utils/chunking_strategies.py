@@ -60,7 +60,8 @@ def spacy_based_chunking(text, chunk_size, overlap_size):
     return splitter.split_text(text)
 
 def sentence_transformer_based_chunking(text, model_name, tokens_per_chunk, overlap_size):
-    splitter = SentenceTransformersTokenTextSplitter(model_name=model_name,
-                                                 tokens_per_chunk=tokens_per_chunk,
-                                                 chunk_overlap=overlap_size)
+    splitter = SentenceTransformersTokenTextSplitter(
+                                    model_name=f"sentence-transformers/{model_name}",
+                                    tokens_per_chunk=tokens_per_chunk,
+                                    chunk_overlap=overlap_size)
     return splitter.split_text(text)

@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.file_handlers import extract_text_from_pdf, extract_text_from_file
-from utils.model_names import OPEN_AI_MODEL_NAMES
+from utils.model_names import OPEN_AI_MODEL_NAMES, SENTENCE_TRANSFORMER_MODEL_NAMES
 from utils.chunking_strategies import (
     recursive_character_chunking,
     character_based_chunking,
@@ -78,7 +78,9 @@ elif strategy == "Spacy-Based":
     chunk_size = st.sidebar.number_input("Chunk Size", min_value=1, max_value=10000, value=500)
     overlap_size = st.sidebar.number_input("Overlap Size", min_value=0, max_value=500, value=100)
 elif strategy == "Sentence-Transformer-Based":
-    pass
+    selected_transformer_model = st.sidebar.selectbox("Choose a model", SENTENCE_TRANSFORMER_MODEL_NAMES)
+    tokens_per_chunk = st.sidebar.number_input("Tokens per chunk", min_value=1, max_value=10000, value=500, help="Here Chunk size refers to the number of tokens.")
+    overlap_size = st.sidebar.number_input("Overlap Size", min_value=0, max_value=500, value=100, help="This signifies the number of tokens to overlap")
 
 # Process the input text if any is provided
 if st.button("Chunk Text"):
@@ -124,8 +126,8 @@ if st.button("Chunk Text"):
         elif strategy == "Sentence-Transformer-Based":
             chunks = sentence_transformer_based_chunking(
                                 text=text,
-                                model_name=model_name,
-                                tokens_per_chunk=token_per_chunk,
+                                model_name=selected_transformer_model,
+                                tokens_per_chunk=tokens_per_chunk,
                                 overlap_size=overlap_size 
                                 )
 

@@ -14,3 +14,12 @@ OPEN_AI_MODEL_NAMES = [
     # open source
     "gpt-2"
 ]
+
+SENTENCE_TRANSFORMER_MODEL_NAMES = [
+    "all-mpnet-base-v2",
+    "multi-qa-mpnet-base-dot-v1",
+    "all-distilroberta-v1",
+    "all-MiniLM-L12-v2",
+    "multi-qa-distilbert-cos-v1",
+    "all-MiniLM-L6-v2"
+]
