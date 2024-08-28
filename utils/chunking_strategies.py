@@ -1,3 +1,5 @@
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter, 
     CharacterTextSplitter, 
@@ -64,4 +66,11 @@ def sentence_transformer_based_chunking(text, model_name, tokens_per_chunk, over
                                     model_name=f"sentence-transformers/{model_name}",
                                     tokens_per_chunk=tokens_per_chunk,
                                     chunk_overlap=overlap_size)
+    return splitter.split_text(text)
+
+def semantic_chunking(text, api_key, embedding_model, breakpoint_threshold_type):
+    splitter = SemanticChunker(OpenAIEmbeddings(
+                                    api_key=api_key, model=embedding_model), 
+                                    breakpoint_threshold_type=breakpoint_threshold_type
+                                    )
     return splitter.split_text(text)

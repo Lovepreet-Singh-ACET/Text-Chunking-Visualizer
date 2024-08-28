@@ -23,3 +23,7 @@ SENTENCE_TRANSFORMER_MODEL_NAMES = [
     "multi-qa-distilbert-cos-v1",
     "all-MiniLM-L6-v2"
 ]
+
+EMBEDDING_MODEL_NAMES = ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]
+
+BREAKPOINT_THRESHOLD_TYPE = ["percentile", "standard_deviation", "interquartile", "gradient"]

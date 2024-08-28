@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.file_handlers import extract_text_from_pdf, extract_text_from_file
-from utils.model_names import OPEN_AI_MODEL_NAMES, SENTENCE_TRANSFORMER_MODEL_NAMES
+from utils.model_names import OPEN_AI_MODEL_NAMES, SENTENCE_TRANSFORMER_MODEL_NAMES, BREAKPOINT_THRESHOLD_TYPE, EMBEDDING_MODEL_NAMES
 from utils.chunking_strategies import (
     recursive_character_chunking,
     character_based_chunking,
@@ -8,7 +8,8 @@ from utils.chunking_strategies import (
     markdown_based_chunking,
     token_based_chunking,
     spacy_based_chunking,
-    sentence_transformer_based_chunking
+    sentence_transformer_based_chunking,
+    semantic_chunking
 )
 
 # Streamlit UI Components
@@ -16,7 +17,7 @@ st.title("Text Chunking Visualizer")
 
 # Sidebar for Chunking Strategy Options
 st.sidebar.title("Chunking Strategy Options")
-strategy = st.sidebar.selectbox("Choose a Chunking Strategy", ["Recursive-Character", "Character-Based", "Code-Based", "Markdown-Based", "Token-Based(tiktoken)", "Spacy-Based", "Sentence-Transformer-Based"])
+strategy = st.sidebar.selectbox("Choose a Chunking Strategy", ["Recursive-Character", "Character-Based", "Code-Based", "Markdown-Based", "Token-Based(tiktoken)", "Spacy-Based", "Sentence-Transformer-Based", "Semantic-Chunking"])
 
 # Dynamic input options based on the chosen strategy
 input_method = None
@@ -25,7 +26,7 @@ uploaded_file = None
 content_type = "text"
 
 # Show relevant input options based on the chunking strategy
-if strategy in ["Recursive-Character", "Character-Based", "Token-Based(tiktoken)", "Spacy-Based", "Sentence-Transformer-Based"]:
+if strategy in ["Recursive-Character", "Character-Based", "Token-Based(tiktoken)", "Spacy-Based", "Sentence-Transformer-Based", "Semantic-Chunking"]:
     input_method = st.sidebar.selectbox("Choose Input Method", ["Paste Text", "Upload PDF", "Upload Text File"])
 elif strategy == "Markdown-Based":
     input_method = "Upload Markdown"  # Force PDF input for this strategy
@@ -81,6 +82,11 @@ elif strategy == "Sentence-Transformer-Based":
     selected_transformer_model = st.sidebar.selectbox("Choose a model", SENTENCE_TRANSFORMER_MODEL_NAMES)
     tokens_per_chunk = st.sidebar.number_input("Tokens per chunk", min_value=1, max_value=10000, value=500, help="Here Chunk size refers to the number of tokens.")
     overlap_size = st.sidebar.number_input("Overlap Size", min_value=0, max_value=500, value=100, help="This signifies the number of tokens to overlap")
+elif strategy == "Semantic-Chunking":
+    API_KEY = st.sidebar.text_input(label="Enter OpenAI API Key", type="password")
+    selected_embedding_model = st.sidebar.selectbox("Choose a embedding model", EMBEDDING_MODEL_NAMES)
+    breakpoint_threshold_type = st.sidebar.selectbox("Choose breakpoint threshold type", BREAKPOINT_THRESHOLD_TYPE)
+
 
 # Process the input text if any is provided
 if st.button("Chunk Text"):
@@ -129,6 +135,13 @@ if st.button("Chunk Text"):
                                 model_name=selected_transformer_model,
                                 tokens_per_chunk=tokens_per_chunk,
                                 overlap_size=overlap_size 
+                                )
+        elif strategy == "Semantic-Chunking":
+            chunks = semantic_chunking(
+                                text=text,
+                                api_key=API_KEY,
+                                embedding_model=selected_embedding_model,
+                                breakpoint_threshold_type=breakpoint_threshold_type
                                 )
 
         st.write("### Chunked Text")
