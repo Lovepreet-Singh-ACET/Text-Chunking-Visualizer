@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.file_handlers import extract_text_from_pdf, extract_text_from_file
+from utils.token_coloring import color_tokens_with_tiktoken, color_tokens_with_sentence_transformer_tokenizer
 from utils.model_names import OPEN_AI_MODEL_NAMES, SENTENCE_TRANSFORMER_MODEL_NAMES, BREAKPOINT_THRESHOLD_TYPE, EMBEDDING_MODEL_NAMES
 from utils.chunking_strategies import (
     recursive_character_chunking,
@@ -72,7 +73,7 @@ elif strategy == "Code-Based":
 elif strategy == "Markdown-Based":
     pass
 elif strategy == "Token-Based(tiktoken)":
-    selected_model = st.sidebar.selectbox("Choose a model", OPEN_AI_MODEL_NAMES)
+    selected_open_ai_model = st.sidebar.selectbox("Choose a model", OPEN_AI_MODEL_NAMES)
     chunk_size = st.sidebar.number_input("Chunk Size", min_value=1, max_value=10000, value=500, help="Here Chunk size refers to the number of tokens.")
     overlap_size = st.sidebar.number_input("Overlap Size", min_value=0, max_value=500, value=100, help="This signifies the number of tokens to overlap")
 elif strategy == "Spacy-Based":
@@ -119,7 +120,7 @@ if st.button("Chunk Text"):
         elif strategy == "Token-Based(tiktoken)":
             chunks = token_based_chunking(
                                 text=text,
-                                model_name=selected_model,
+                                model_name=selected_open_ai_model,
                                 chunk_size=chunk_size,
                                 overlap_size=overlap_size
                                 )
@@ -132,7 +133,7 @@ if st.button("Chunk Text"):
         elif strategy == "Sentence-Transformer-Based":
             chunks = sentence_transformer_based_chunking(
                                 text=text,
-                                model_name=selected_transformer_model,
+                                model_name=f"sentence-transformers/{selected_transformer_model}",
                                 tokens_per_chunk=tokens_per_chunk,
                                 overlap_size=overlap_size 
                                 )
@@ -148,11 +149,22 @@ if st.button("Chunk Text"):
         for i, chunk in enumerate(chunks):
             # Using expander to make chunks collapsible
             with st.expander(f"Chunk {i+1} (Length: {len(chunk)} chars)"):
-                print(content_type)
+                # print(content_type)
                 if content_type == "code":
                     print(code_language)
                     # Display chunk using st.code to preserve formatting for code
                     st.code(chunk, language=code_language)
+                elif strategy == "Token-Based(tiktoken)":
+                    colored_chunk = color_tokens_with_tiktoken(text=chunk, model_name=selected_open_ai_model)
+                    st.markdown(colored_chunk, unsafe_allow_html=True)
+                    # bg_color = "#F5F5DC" if i % 2 == 0 else "#D3D3D3"  # Light yellow and light gray
+                    # st.markdown(f"<div style='background-color: {bg_color}; padding: 10px; border-radius: 5px; color: black;'>{colored_chunk}</div>", unsafe_allow_html=True)
+                elif strategy == "Sentence-Transformer-Based":
+                    colored_chunk = color_tokens_with_sentence_transformer_tokenizer(
+                                                text=chunk, 
+                                                model_name=f"sentence-transformers/{selected_transformer_model}"
+                                                )
+                    st.markdown(colored_chunk, unsafe_allow_html=True)
                 else:
                     # Different background colors for alternating chunks
                     bg_color = "#F5F5DC" if i % 2 == 0 else "#D3D3D3"  # Light yellow and light gray
